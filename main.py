@@ -2,6 +2,7 @@ from io import BufferedWriter
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.responses import JSONResponse, Response
 from services.question_generator import gerar_questoes_tema, gerar_questoes_pdf
+from services.activity_generator import gerar_atividade_tema, gerar_atividade_pdf
 from services.audio_text_converter import transcrever_audio_gemini
 from services.text_audio_converter import synthesize_speech
 import os
@@ -45,6 +46,38 @@ def questoes_pdf(
     conteudo = arquivo.file.read()
     questoes = gerar_questoes_pdf(conteudo, tipo, qtd, consulta, dificuldade)
     return {"arquivo": arquivo.filename, "questoes": questoes}
+
+
+# ------- GERADOR DE ATIVIDADES  -----------------------
+@app.post("/gerar-atividade-tema")
+def atividade_tema(
+    token: str = Form(...),
+    tema: str = Form(...),
+    tipo: str = Form(...),
+    quantidade: str = Form(...),
+    infos_extras: str = Form("")
+):
+    if token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    atividade = gerar_atividade_tema(tema, tipo, infos_extras, quantidade)
+    return {"tipo": tipo, "tema": tema, "atividade": atividade}
+
+@app.post("/gerar-atividade-pdf")
+def atividade_pdf(
+    token: str = Form(...),
+    tipo: str = Form(...),
+    quantidade: str = Form(...),
+    infos_extras: str = Form(...),
+    consulta: str = Form(""),
+    arquivo: UploadFile = File(...)
+):
+    if token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    conteudo = arquivo.file.read()
+    atividade = gerar_atividade_pdf(conteudo, tipo, quantidade, consulta, infos_extras)
+    return {"tipo": tipo, "tema": "Baseado em arquivo", "atividade": atividade}
+
+
 
 # ------- TRANSCRIÇÃO DE ÁUDIO -----------------------
 @app.post("/transcrever-audio")
