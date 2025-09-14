@@ -220,7 +220,7 @@ def get_prompt_pdf(tipo_atividade: str):
 
                                        1. Analise o conteúdo fornecido abaixo e identifique os conceitos mais relevantes
                                        2. Escolha um conceito central sobre o tema que possa ser avaliado como uma atividade do tipo estudo de caso.
-                                        3. Elabore um enunciado claro e contextualizado baseado nesse conceito.
+                                       3. Elabore um enunciado claro e contextualizado baseado nesse conceito.
                                        4. O enunciado deve ter pelo menos 100 palavras.
                                        5. Defina um nome para a atividade com base no contexto dela.
                                        6. Elabore um padrão de resposta que será usado pelo professor para a correção da atividade.

@@ -3,6 +3,7 @@ from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.responses import JSONResponse, Response
 from services.question_generator import gerar_questoes_tema, gerar_questoes_pdf
 from services.activity_generator import gerar_atividade_tema, gerar_atividade_pdf
+from services.script_generator import gerar_roteiro_tema, gerar_roteiro_pdf
 from services.audio_text_converter import transcrever_audio_gemini
 from services.text_audio_converter import synthesize_speech
 import os
@@ -76,6 +77,35 @@ def atividade_pdf(
     conteudo = arquivo.file.read()
     atividade = gerar_atividade_pdf(conteudo, tipo, quantidade, consulta, infos_extras)
     return {"tipo": tipo, "tema": "Baseado em arquivo", "atividade": atividade}
+
+# ------- GERADOR DE ROTEIRO  -----------------------
+@app.post("/gerar-roteiro-tema")
+def roteiro_tema(
+    token: str = Form(...),
+    tema: str = Form(...),
+    tipo: str = Form(...),
+    tempo: str = Form(...),
+    infos_extras: str = Form("")
+):
+    if token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    roteiro = gerar_roteiro_tema(tema, tipo, infos_extras, tempo)
+    return {"tipo": tipo, "tema": tema, "roteiro": roteiro}
+
+@app.post("/gerar-roteiro-pdf")
+def roteiro_pdf(
+    token: str = Form(...),
+    tipo: str = Form(...),
+    tempo: str = Form(...),
+    infos_extras: str = Form(...),
+    consulta: str = Form(""),
+    arquivo: UploadFile = File(...)
+):
+    if token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    conteudo = arquivo.file.read()
+    roteiro = gerar_roteiro_pdf(conteudo, tipo, tempo, consulta, infos_extras)
+    return {"tipo": tipo, "tema": "Baseado em arquivo", "roteiro": roteiro}
 
 
 
