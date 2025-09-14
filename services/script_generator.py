@@ -123,7 +123,8 @@ def get_prompt_tema(tipo_roteiro: str):
                    3. Elabore os tópicos para a aula de forma contextualizada e baseada nesse conceito.
                    4. Defina um nome para a aula com base no contexto dela.
                    5. O roteiro deve ser construído para exatamente {tempo} minutos de aula.
-                   6. Na elaboração do roteiro considere também as informações abaixo:
+                   6. Mostrar os itens a serem trabalhados em formato de tópicos.
+                   7. Na elaboração do roteiro considere também as informações abaixo:
 
                    {infos_extras}
 
@@ -153,7 +154,8 @@ def get_prompt_tema(tipo_roteiro: str):
                    3. Elabore os tópicos para o vídeo de forma contextualizada e baseada nesse conceito.
                    4. Defina um nome para o vídeo com base no contexto dela.
                    5. O roteiro deve ser construído para exatamente {tempo} minutos de vídeo.
-                   6. Na elaboração do roteiro considere também as informações abaixo:
+                   6. Mostrar os itens a serem trabalhados em formato de tópicos.
+                   7. Na elaboração do roteiro considere também as informações abaixo:
 
                    {infos_extras}
 
@@ -221,7 +223,8 @@ def get_prompt_pdf(tipo_roteiro: str):
                     3. Elabore os tópicos para a aula de forma contextualizada e baseada nesse conceito.
                     4. Defina um nome para a aula com base no contexto dela.
                     5. O roteiro deve ser construído para exatamente {tempo} minutos de aula.
-                    6. Na elaboração do roteiro considere também as informações abaixo:
+                    6. Mostrar os itens a serem trabalhados em formato de tópicos.
+                    7. Na elaboração do roteiro considere também as informações abaixo:
 
                     {infos_extras}
 
@@ -252,7 +255,8 @@ def get_prompt_pdf(tipo_roteiro: str):
                    3. Elabore os tópicos para o vídeo de forma contextualizada e baseada nesse conceito.
                    4. Defina um nome para o vídeo com base no contexto dela.
                    5. O roteiro deve ser construído para exatamente {tempo} minutos de vídeo.
-                   6. Na elaboração do roteiro considere também as informações abaixo:
+                   6. Mostrar os itens a serem trabalhados em formato de tópicos.
+                   7. Na elaboração do roteiro considere também as informações abaixo:
 
                    {infos_extras}
 
