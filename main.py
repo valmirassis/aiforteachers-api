@@ -6,6 +6,7 @@ from services.activity_generator import gerar_atividade_tema, gerar_atividade_pd
 from services.script_generator import gerar_roteiro_tema, gerar_roteiro_pdf
 from services.audio_text_converter import transcrever_audio_gemini
 from services.text_audio_converter import synthesize_speech
+from services.image_describe import describe_image
 import os
 import uuid
 import shutil
@@ -128,7 +129,6 @@ async def transcrever_audio(
 
     try:
         result = transcrever_audio_gemini(in_path, idioma)
-        # você pode salvar o .json em /out se quiser
         # with open(os.path.join(STORAGE_DIR, "out", f"{fname}.json"), "w", encoding="utf-8") as out:
         #     json.dump(result, out, ensure_ascii=False, indent=2)
 
@@ -193,3 +193,34 @@ async def audio_sintetizar(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao sintetizar áudio: {e}")
+
+# ------- TRANSCRIÇÃO DE IMAGEM -----------------------
+@app.post("/descrever-imagem")
+def descrever_imagem(
+    token: str = Form(...),
+    idioma_saida: str = Form("pt-BR"),
+    tom: str = Form("neutro"),
+    quantidade_caracteres: int = Form(...),
+    arquivo: UploadFile = File(...)
+):
+    if token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+
+    conteudo = arquivo.file.read()
+    if not conteudo or len(conteudo) < 20:
+        raise HTTPException(status_code=400, detail="Arquivo inválido ou vazio.")
+
+    mime = arquivo.content_type or "image/jpeg"
+    if not mime.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Envie um arquivo de imagem (png, jpg, webp, etc.).")
+
+    #llm = build_chain()
+    resultado = describe_image(
+        image_bytes=conteudo,
+        mime_type=mime,
+        idioma_saida=idioma_saida,
+        tom=tom,
+        quantidade_caracteres=quantidade_caracteres
+    )
+
+    return {"descricao": resultado}

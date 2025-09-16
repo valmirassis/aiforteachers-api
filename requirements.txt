@@ -4,6 +4,7 @@ python-dotenv
 langchain
 langchain-google-genai
 langchain-community
+langchain_core
 numpy
 pypdf
 python-multipart
