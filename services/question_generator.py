@@ -11,7 +11,7 @@ from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddi
 load_dotenv()
 
 # Inicializa LLM e embeddings
-llm = GoogleGenerativeAI(model="models/gemini-2.5-flash", temperature=0.8)
+llm = GoogleGenerativeAI(model="models/gemini-2.5-flash", temperature=0.4, max_output_tokens=8196)
 embedding_model = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 
 
@@ -155,9 +155,9 @@ def get_prompt_tema(tipo_questao: str):
                         4. Elabore 5 alternativas (a–e), com diferentes combinações de afirmativas corretas.
                         5. Verifique se **as afirmativas ou o enunciado não indicam claramente qual alternativa é correta apenas pela redação**.
                         6. Indique qual alternativa é a correta.
-                        7. Justifique de forma detalhada por que a alternativa correta está certa.
-                        8. Justifique de forma detalhada por que as demais alternativas estão incorretas.
-                        9. Apresente quebras de linha entre as alternativas e entre as justificativas para ficar bem separado. 
+                        7. Justifique por que a alternativa correta está certa.
+                        8. Justifique por que as demais alternativas estão incorretas.
+                        9. Apresente quebras de linha entre as alternativas e as justificativas para ficar bem separado. 
                         
                         {dificuldade}
                         
@@ -193,7 +193,6 @@ def get_prompt_tema(tipo_questao: str):
                         **Alternativa correta:** ...
                         
                         **Justificativa (raciocínio passo a passo):**
-                        
                         Confirme se realmente não é possível responder a questão com as informações presentes no enunciado
                         se sim, gere outra questão.
             """
@@ -213,8 +212,8 @@ def get_prompt_tema(tipo_questao: str):
                         4. Elabore 5 alternativas (a–e) sobre a veracidade das asserções e se a razão justifica a asserção.
                         5. Verifique se **o enunciado não antecipa a resposta correta nem contém pistas óbvias**.
                         6. Indique qual alternativa é a correta.
-                        7. Justifique de forma detalhada por que a alternativa correta está certa.
-                        8. Justifique de forma detalhada por que as demais alternativas estão incorretas.
+                        7. Justifique por que a alternativa correta está certa.
+                        8. Justifique por que as demais alternativas estão incorretas.
                         9. Apresente quebras de linha entre as alternativas e entre as justificativas para ficar bem separado. 
                       
                         {dificuldade}
@@ -274,8 +273,8 @@ def get_prompt_pdf(tipo_questao: str):
                      4. Verifique se a **resposta correta não está explícita no enunciado**.
                      5. Crie 5 alternativas (a–e), sendo apenas uma correta.
                      6. Indique qual alternativa é a correta.
-                     7. Justifique de forma detalhada por que a alternativa correta está certa.
-                     8. Justifique de forma detalhada por que as demais alternativas estão incorretas.
+                     7. Justifique por que a alternativa correta está certa.
+                     8. Justifique por que as demais alternativas estão incorretas.
                      9. Apresente quebras de linha entre as alternativas e entre as justificativas para ficar bem separado. 
                  
                      Evite copiar diretamente o conteúdo original. Não mencione nomes de documentos ou fontes no enunciado.
@@ -326,8 +325,8 @@ def get_prompt_pdf(tipo_questao: str):
                         4. Elabore 5 alternativas (a–e), com diferentes combinações de afirmativas corretas.
                         5. Verifique se **as afirmativas não indicam claramente qual alternativa é correta apenas pela redação**.
                         6. Indique qual alternativa é a correta.
-                        7. Justifique de forma detalhada por que a alternativa correta está certa.
-                        8. Justifique de forma detalhada por que as demais alternativas estão incorretas.
+                        7. Justifique por que a alternativa correta está certa.
+                        8. Justifique por que as demais alternativas estão incorretas.
                         9. Apresente quebras de linha entre as alternativas e entre as justificativas para ficar bem separado. 
                                                
                         Evite copiar diretamente o conteúdo original. Não mencione o nome do documento.
@@ -385,8 +384,8 @@ def get_prompt_pdf(tipo_questao: str):
                                   4. Elabore 5 alternativas (a–e) sobre a veracidade das asserções e se a razão justifica a asserção.
                                   5. Verifique se **o enunciado não antecipa a resposta correta nem contém pistas óbvias**.
                                   6. Indique qual alternativa é a correta.
-                                  7. Justifique de forma detalhada por que a alternativa correta está certa.
-                                  8. Justifique de forma detalhada por que as demais alternativas estão incorretas.
+                                  7. Justifique por que a alternativa correta está certa.
+                                  8. Justifique por que as demais alternativas estão incorretas.
                                   9. Apresente quebras de linha entre as alternativas e entre as justificativas para ficar bem separado. 
 
                                   Evite copiar diretamente o conteúdo original. Não mencione o nome do documento.

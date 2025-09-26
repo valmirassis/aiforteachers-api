@@ -11,7 +11,7 @@ from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddi
 load_dotenv()
 
 # Inicializa LLM e embeddings
-llm = GoogleGenerativeAI(model="models/gemini-2.5-flasht", temperature=0.8)
+llm = GoogleGenerativeAI(model="models/gemini-2.5-flash", temperature=0.4, max_output_tokens=8196)
 embedding_model = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 
 

@@ -11,7 +11,7 @@ if not GOOGLE_API_KEY:
     raise RuntimeError("Defina GOOGLE_API_KEY no .env")
 
 model = ChatGoogleGenerativeAI(
-    model="gemini-1.5-pro",
+    model="gemini-2.5-flash",
     google_api_key=GOOGLE_API_KEY,
 
     # outros parâmetros diretos: temperature=..., max_output_tokens=...

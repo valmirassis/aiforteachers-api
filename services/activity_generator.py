@@ -11,17 +11,14 @@ from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddi
 load_dotenv()
 
 # Inicializa LLM e embeddings
-llm = GoogleGenerativeAI(model="models/gemini-2.5-flash", temperature=0.8)
+llm = GoogleGenerativeAI(model="models/gemini-2.5-flash", temperature=0.4, max_output_tokens=8196)
 embedding_model = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 
-
 def gerar_atividade_tema(tema: str, tipo: str, quantidade: str, infos_extras: str):
-
 
     prompt = get_prompt_tema(tipo)
     chain = LLMChain(llm=llm, prompt=prompt)
     return chain.run(tema=tema, infos_extras=infos_extras, quantidade=quantidade)
-
 
 def gerar_atividade_pdf(arquivo, tipo: str, quantidade: int, consulta: str, infos_extras: str):
 
