@@ -8,7 +8,7 @@ from langchain_core.messages import HumanMessage
 load_dotenv()
 
 # Inicializa LLM
-llm = ChatGoogleGenerativeAI(model="models/gemini-1.5-pro-latest", temperature=0.8)
+llm = ChatGoogleGenerativeAI(model="models/gemini-2.5-flash", temperature=0.8)
 
 def _to_data_url(image_bytes: bytes, mime: str) -> str:
     b64 = base64.b64encode(image_bytes).decode("utf-8")

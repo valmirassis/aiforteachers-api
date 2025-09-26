@@ -11,8 +11,8 @@ from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddi
 load_dotenv()
 
 # Inicializa LLM e embeddings
-llm = GoogleGenerativeAI(model="models/gemini-1.5-pro-latest", temperature=0.8)
-embedding_model = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-exp-03-07")
+llm = GoogleGenerativeAI(model="models/gemini-2.5-flash", temperature=0.8)
+embedding_model = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 
 
 def gerar_atividade_tema(tema: str, tipo: str, quantidade: str, infos_extras: str):
