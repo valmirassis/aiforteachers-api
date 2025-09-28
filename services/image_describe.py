@@ -1,3 +1,4 @@
+import os
 import base64
 import json
 from dotenv import load_dotenv
@@ -8,7 +9,8 @@ from langchain_core.messages import HumanMessage
 load_dotenv()
 
 # Inicializa LLM
-llm = GoogleGenerativeAI(model="models/gemini-2.5-flash", temperature=0.4, max_output_tokens=8196)
+LLM_GEMINI = os.getenv("LLM_GEMINI")
+llm = ChatGoogleGenerativeAI(model=LLM_GEMINI, temperature=0.4, max_output_tokens=8196)
 
 def _to_data_url(image_bytes: bytes, mime: str) -> str:
     b64 = base64.b64encode(image_bytes).decode("utf-8")
@@ -35,7 +37,7 @@ def describe_image(
         "Responda SEMPRE em JSON válido, seguindo exatamente este esquema:\n\n"
         "{\n"
         f'  "alt_text": "string curta (até 160 caracteres)",\n'
-        f'  "descricao_longa": "parágrafo(s) objetivo(s) ( aproximadamente {quantidade_caracteres} caracteres)",\n'
+        f'  "descricao_longa": "parágrafo(s) objetivo(s), até {quantidade_caracteres}  caracteres (contando espaços).",\n'
         '  "texto_detectado": "texto OCR se houver",\n'
         '  "tags": ["3 a 10 palavras-chave"],\n'
         '  "seguranca": {\n'
@@ -60,7 +62,14 @@ def describe_image(
     )
 
     resp = llm.invoke([msg])
-    text = (resp.content or "").strip()
+
+    # Se vier string, usa direto; se vier objeto, pega .content
+    if isinstance(resp, str):
+        text = resp.strip()
+    elif hasattr(resp, "content"):
+        text = (resp.content or "").strip()
+    else:
+        text = str(resp).strip()
 
     # normaliza se vier com ```json
     if text.startswith("```"):

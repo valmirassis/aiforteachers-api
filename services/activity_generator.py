@@ -3,22 +3,47 @@ import numpy as np
 import tempfile
 from dotenv import load_dotenv
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddings
-
+from langchain_google_genai import  GoogleGenerativeAIEmbeddings
+from google import genai
+from google.genai import types
 load_dotenv()
 
-# Inicializa LLM e embeddings
-llm = GoogleGenerativeAI(model="models/gemini-2.5-flash", temperature=0.4, max_output_tokens=8196)
-embedding_model = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
+client = genai.Client()
+
+LLM_GEMINI = os.getenv("LLM_GEMINI")
+embedding_model = GoogleGenerativeAIEmbeddings(model=os.getenv("EMBEDDING_MODEL"))
 
 def gerar_atividade_tema(tema: str, tipo: str, quantidade: str, infos_extras: str):
+    # 1. Obter e formatar o prompt
+    prompt_template = get_prompt_tema(tipo)
 
-    prompt = get_prompt_tema(tipo)
-    chain = LLMChain(llm=llm, prompt=prompt)
-    return chain.run(tema=tema, infos_extras=infos_extras, quantidade=quantidade)
+    # 2. Criar a string final do prompt
+    final_prompt = prompt_template.format(
+        tema=tema,
+        infos_extras=infos_extras,
+        quantidade=quantidade,
+
+    )
+  # 3. Chamar o SDK Nativo com a configuração de raciocínio
+    try:
+        response = client.models.generate_content(
+            model=LLM_GEMINI,
+            contents=final_prompt,
+            config=types.GenerateContentConfig(
+
+                max_output_tokens=8192,
+
+                thinking_config=types.ThinkingConfig(
+                    thinking_budget=0  # <-- DESATIVA O RACIOCÍNIO
+                ),
+                temperature=0.4
+            )
+        )
+        return response.text
+    except Exception as e:
+        return f"Erro ao gerar conteúdo: {e}"
 
 def gerar_atividade_pdf(arquivo, tipo: str, quantidade: int, consulta: str, infos_extras: str):
 
@@ -68,9 +93,34 @@ def gerar_atividade_pdf(arquivo, tipo: str, quantidade: int, consulta: str, info
                              sorted(similaridades, key=lambda x: x[0], reverse=True)[:5]]
         texto_base = "\n".join(chunk.page_content for chunk in chunks_relevantes)
 
-    prompt = get_prompt_pdf(tipo)
-    chain = LLMChain(llm=llm, prompt=prompt)
-    return chain.run(input=texto_base, quantidade=quantidade, infos_extras=infos_extras)
+        # 1. Obter e formatar o prompt
+    prompt_template = get_prompt_pdf(tipo)
+
+    # 2. Criar a string final do prompt
+    final_prompt = prompt_template.format(
+        input=texto_base,
+        infos_extras=infos_extras,
+        quantidade=quantidade,
+
+    )
+    # 3. Chamar o SDK Nativo com a configuração de raciocínio
+    try:
+        response = client.models.generate_content(
+            model=LLM_GEMINI,
+            contents=final_prompt,
+            config=types.GenerateContentConfig(
+
+                max_output_tokens=8192,
+
+                thinking_config=types.ThinkingConfig(
+                    thinking_budget=0  # <-- DESATIVA O RACIOCÍNIO
+                ),
+                temperature=0.4
+            )
+        )
+        return response.text
+    except Exception as e:
+        return f"Erro ao gerar conteúdo: {e}"
 
 
 def get_prompt_tema(tipo_atividade: str):
