@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse, Response
 from services.question_generator import gerar_questoes_tema, gerar_questoes_pdf
 from services.activity_generator import gerar_atividade_tema, gerar_atividade_pdf
 from services.script_generator import gerar_roteiro_tema, gerar_roteiro_pdf
+from services.text_transformer import traduzir, reescrever, resumir, resumirPDF, revisar, expandir, criar
 from services.audio_text_converter import transcrever_audio_gemini
 from services.text_audio_converter import synthesize_speech
 from services.image_describe import describe_image
@@ -155,6 +156,7 @@ async def audio_sintetizar(
     tom: float | None = Form(None),           # -20.0–20.0
     ganho_db: float | None = Form(None)       # -96.0–16.0
 ):
+
     if token != API_TOKEN:
         raise HTTPException(status_code=401, detail="Token inválido")
 
@@ -224,3 +226,100 @@ def descrever_imagem(
     )
 
     return {"descricao": resultado}
+
+# ------- TRANSFORMADOR DE TEXTO -----------------------
+@app.post("/traduzir-texto")
+def traduzir_texto(
+    token: str = Form(...),
+    texto: str = Form(...),
+    tipo: str = Form(...),
+    idioma: str = Form(...),
+    infos_extras: str = Form("")
+):
+
+    if token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    retorno = traduzir(texto, tipo, infos_extras, idioma)
+    return {"tipo": tipo, "texto": retorno, "idioma": idioma}
+
+@app.post("/reescrever-texto")
+def reescrever_texto(
+    token: str = Form(...),
+    texto: str = Form(...),
+    tipo: str = Form(...),
+    tom: str = Form(...),
+    infos_extras: str = Form("")
+):
+
+    if token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    retorno = reescrever(texto, tipo, tom, infos_extras)
+    return {"tipo": tipo, "texto": retorno, "idioma": tom}
+
+@app.post("/revisar-texto")
+def revisar_texto(
+    token: str = Form(...),
+    texto: str = Form(...),
+    tipo: str = Form(...),
+    infos_extras: str = Form("")
+):
+
+    if token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    retorno = revisar(texto, tipo, infos_extras)
+    return {"tipo": tipo, "texto": retorno}
+
+@app.post("/expandir-texto")
+def expandir_texto(
+    token: str = Form(...),
+    texto: str = Form(...),
+    tipo: str = Form(...),
+    quantidade: int = Form(...),
+    infos_extras: str = Form("")
+):
+
+    if token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    retorno = expandir(texto, tipo, quantidade, infos_extras)
+    return {"tipo": tipo, "texto": retorno}
+
+@app.post("/criar-texto")
+def criar_texto(
+    token: str = Form(...),
+    tema: str = Form(...),
+    tipo: str = Form(...),
+    quantidade: int = Form(...),
+    formato: str = Form(...),
+    infos_extras: str = Form("")
+):
+    if token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    retorno = criar(tema, tipo, quantidade, formato, infos_extras)
+    return {"tipo": tipo, "texto": retorno, "formato":formato}
+
+@app.post("/resumir-texto")
+def resumir_texto(
+    token: str = Form(...),
+    texto: str = Form(...),
+    tipo: str = Form(...),
+    formato: str = Form(...),
+    infos_extras: str = Form("")
+):
+    if token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    retorno = resumir(texto, tipo, formato, infos_extras)
+    return {"tipo": tipo, "texto": retorno, "formato":formato}
+
+@app.post("/resumir-pdf")
+def resumir_pdf(
+    token: str = Form(...),
+    tipo: str = Form(...),
+    formato: str = Form(...),
+    infos_extras: str = Form(...),
+    arquivo: UploadFile = File(...)
+):
+    if token != API_TOKEN:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    conteudo = arquivo.file.read()
+    retorno = resumirPDF(conteudo, tipo, formato,  infos_extras)
+    return {"tipo": tipo, "texto": retorno, "formato":formato}
