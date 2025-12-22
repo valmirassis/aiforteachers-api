@@ -14,17 +14,30 @@ client = genai.Client()
 
 LLM_GEMINI = os.getenv("LLM_GEMINI")
 embedding_model = GoogleGenerativeAIEmbeddings(model=os.getenv("EMBEDDING_MODEL"))
-
-def gerar_atividade_tema(tema: str, tipo: str, quantidade: str, infos_extras: str):
+sensitive_content = """Analise o texto fornecido e verifique se ele contém qualquer tipo de conteúdo sensível, incluindo, mas não se limitando a:
+                        - conteúdo sexual explícito ou implícito;
+                        - violência física, psicológica ou sexual;
+                        - abuso, exploração ou assédio;
+                        - linguagem sexualizada ou violenta.
+                        Se qualquer conteúdo sensível for identificado, retorne APENAS a mensagem:
+                           ERRO: O texto contém conteúdo sensível e não pode ser processado."""
+def gerar_atividade_tema(tema: str, tipo: str, quantidade: str, nivel: str, infos_extras: str):
     # 1. Obter e formatar o prompt
     prompt_template = get_prompt_tema(tipo)
+    if infos_extras and infos_extras.strip():
+        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
 
+    nivel = f"""Considere a taxonomia de Bloom  
+          Dificuldade fácil: níveis 1 ou 2 (lembrança ou compreensão)
+          Dificuldade difícil: níveis 3, 4 ou 5 (aplicação, análise ou avaliação).                    
+          A atividade gerada deve ser do nível {nivel}"""
     # 2. Criar a string final do prompt
     final_prompt = prompt_template.format(
         tema=tema,
         infos_extras=infos_extras,
         quantidade=quantidade,
-
+        nivel=nivel,
+        conteudo_sensivel=sensitive_content
     )
   # 3. Chamar o SDK Nativo com a configuração de raciocínio
     try:
@@ -36,7 +49,7 @@ def gerar_atividade_tema(tema: str, tipo: str, quantidade: str, infos_extras: st
                 max_output_tokens=8192,
 
                 thinking_config=types.ThinkingConfig(
-                    thinking_budget=0  # <-- DESATIVA O RACIOCÍNIO
+                    thinking_budget=0  #  DESATIVA O RACIOCÍNIO
                 ),
                 temperature=0.4
             )
@@ -45,7 +58,7 @@ def gerar_atividade_tema(tema: str, tipo: str, quantidade: str, infos_extras: st
     except Exception as e:
         return f"Erro ao gerar conteúdo: {e}"
 
-def gerar_atividade_pdf(arquivo, tipo: str, quantidade: int, consulta: str, infos_extras: str):
+def gerar_atividade_pdf(arquivo, tipo: str, quantidade: int, nivel: str, consulta: str, infos_extras: str):
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
         tmp_file.write(arquivo)
@@ -96,12 +109,15 @@ def gerar_atividade_pdf(arquivo, tipo: str, quantidade: int, consulta: str, info
         # 1. Obter e formatar o prompt
     prompt_template = get_prompt_pdf(tipo)
 
-    # 2. Criar a string final do prompt
+    if infos_extras and infos_extras.strip():
+        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
+
     final_prompt = prompt_template.format(
         input=texto_base,
         infos_extras=infos_extras,
         quantidade=quantidade,
-
+        nivel=nivel,
+        conteudo_sensivel=sensitive_content
     )
     # 3. Chamar o SDK Nativo com a configuração de raciocínio
     try:
@@ -128,24 +144,26 @@ def get_prompt_tema(tipo_atividade: str):
         return PromptTemplate.from_template(
             """
           Você é um professor de Ensino Superior e precisa elaborar o enunciado de {quantidade} atividade do 
-          tipo Estudo de caso para avaliação.                     
-
+          tipo Estudo de caso para avaliação. 
+          
+          {conteudo_sensivel}   
+            {nivel}
                                Siga o seguinte raciocínio passo a passo:
 
                                1. Analise o tema fornecido abaixo.
                                2. Escolha um conceito central sobre o tema que possa ser avaliado como uma atividade do tipo estudo de caso.
-                                3. Elabore um enunciado claro e contextualizado baseado nesse conceito.
+                               3. Elabore um enunciado claro e contextualizado baseado nesse conceito.
                                4. O enunciado deve ter pelo menos 100 palavras.
                                5. Defina um nome para a atividade com base no contexto dela.
                                6. Elabore um padrão de resposta que será usado pelo professor para a correção da atividade.
-                               7. Na elaboração considere também as informações abaixo:
+                               
 
                                {infos_extras}
 
                                Tema da atividade:
                                {tema}
 
-                               Apresente a atividade no seguinte formato:
+                               Apresente a atividade no seguinte formato (não exiba mensagem de saudação):
                                inserir uma linha horizontal
                                **Nome da atividade:**
 
@@ -159,8 +177,9 @@ def get_prompt_tema(tipo_atividade: str):
         return PromptTemplate.from_template(
             """
           Você é um professor de Ensino Superior e precisa elaborar o enunciado de {quantidade} atividade do tipo 
-          Quadro comparativo  para avaliação.                     
-
+          Quadro comparativo  para avaliação.     
+          {conteudo_sensivel}                   
+             {nivel}
                                Siga o seguinte raciocínio passo a passo:
 
                                1. Analise o tema fornecido abaixo.
@@ -169,14 +188,13 @@ def get_prompt_tema(tipo_atividade: str):
                                4. O enunciado deve ter pelo menos 100 palavras.
                                5. Defina um nome para a atividade com base no contexto dela.
                                6. Elabore um padrão de resposta em formato de tabela que será usado pelo professor para a correção da atividade.
-                               7. Na elaboração considere também as informações abaixo:
 
                                {infos_extras}
 
                                Tema da atividade:
                                {tema}
 
-                               Apresente a atividade no seguinte formato:
+                               Apresente a atividade no seguinte formato (não exiba mensagem de saudação):
                                inserir uma linha horizontal
                                **Nome da atividade:**
 
@@ -189,8 +207,9 @@ def get_prompt_tema(tipo_atividade: str):
     elif tipo_atividade == "C":
         return PromptTemplate.from_template(
             """
-          Você é um professor de Ensino Superior e precisa elaborar questões discursivas.                     
-
+          Você é um professor de Ensino Superior e precisa elaborar questões discursivas.     
+          {conteudo_sensivel}                   
+             {nivel}
                                Siga o seguinte raciocínio passo a passo:
 
                                1. Analise o tema fornecido abaixo.
@@ -202,7 +221,6 @@ def get_prompt_tema(tipo_atividade: str):
                                7. Contextualize o enunciado, mas no momento de pedir a resposta para o aluno, peça apenas uma coisa.
                                8. Gere exatamente {quantidade} questões
                                9. Não informe no enunciado o tamanho da resposta do aluno
-                               10 Na elaboração considere também as informações abaixo:
 
                                {infos_extras}
                                 
@@ -210,7 +228,7 @@ def get_prompt_tema(tipo_atividade: str):
                                Tema da atividade:
                                {tema}
 
-                               Apresente a atividade no seguinte formato:
+                               Apresente a atividade no seguinte formato (não exiba mensagem de saudação):
                                inserir uma linha horizontal
                                **Nome da atividade:**
                                 
@@ -225,7 +243,7 @@ def get_prompt_tema(tipo_atividade: str):
             """
          Você é um professor de Ensino Superior e precisa elaborar o enunciado de {quantidade} atividade do tipo 
           Mapa mental  para avaliação.                     
-
+             {nivel}
                                Siga o seguinte raciocínio passo a passo:
 
                                1. Analise o tema fornecido abaixo.
@@ -236,14 +254,13 @@ def get_prompt_tema(tipo_atividade: str):
                                6. Elabore um padrão de resposta em formato de tópicos que deverá aparecer no mapa mental
                                7. O padrão de resposta será usado pelo professor para a correção da atividade.
                                8. Evite copiar diretamente o conteúdo original. Não mencione nomes de documentos ou fontes no enunciado.
-                               9. Na elaboração considere também as informações abaixo:
 
                                {infos_extras}
 
                                Tema da atividade:
                                {tema}
 
-                               Apresente a atividade no seguinte formato:
+                               Apresente a atividade no seguinte formato (não exiba mensagem de saudação):
                                inserir uma linha horizontal
                                **Nome da atividade:**
 
@@ -261,8 +278,9 @@ def get_prompt_pdf(tipo_atividade: str):
         return PromptTemplate.from_template(
             """
                   Você é um professor de Ensino Superior e precisa elaborar o enunciado de {quantidade} atividade do 
-                  tipo Estudo de caso para avaliação.                     
-
+                  tipo Estudo de caso para avaliação.      
+                  {conteudo_sensivel}                  
+                     {nivel}
                                        Siga o seguinte raciocínio passo a passo:
 
                                        1. Analise o conteúdo fornecido abaixo e identifique os conceitos mais relevantes
@@ -272,14 +290,13 @@ def get_prompt_pdf(tipo_atividade: str):
                                        5. Defina um nome para a atividade com base no contexto dela.
                                        6. Elabore um padrão de resposta que será usado pelo professor para a correção da atividade.
                                        7. Evite copiar diretamente o conteúdo original. Não mencione nomes de documentos ou fontes no enunciado.
-                                       8. Na elaboração considere também as informações abaixo:
                                        
                                        {infos_extras}
 
                                        Conteúdo de base:
                                        {input}
 
-                                       Apresente a atividade no seguinte formato:
+                                       Apresente a atividade no seguinte formato (não exiba mensagem de saudação):
                                        inserir uma linha horizontal
                                        **Nome da atividade:**
 
@@ -293,8 +310,9 @@ def get_prompt_pdf(tipo_atividade: str):
         return PromptTemplate.from_template(
             """
           Você é um professor de Ensino Superior e precisa elaborar o enunciado de {quantidade} atividade do tipo 
-          Quadro comparativo  para avaliação.                     
-
+          Quadro comparativo  para avaliação.       
+          {conteudo_sensivel}                 
+             {nivel}
                                Siga o seguinte raciocínio passo a passo:
 
                                1. Analise o conteúdo fornecido abaixo e identifique os conceitos mais relevantes
@@ -304,14 +322,13 @@ def get_prompt_pdf(tipo_atividade: str):
                                5. Defina um nome para a atividade com base no contexto dela.
                                6. Elabore um padrão de resposta em formato de tabela que será usado pelo professor para a correção da atividade.
                                7. Evite copiar diretamente o conteúdo original. Não mencione nomes de documentos ou fontes no enunciado.
-                               8. Na elaboração considere também as informações abaixo:
                                
                                {infos_extras}
 
                                Conteúdo de base:
                                 {input}
                                 
-                               Apresente a atividade no seguinte formato:
+                               Apresente a atividade no seguinte formato (não exiba mensagem de saudação):
                                inserir uma linha horizontal
                                **Nome da atividade:**
 
@@ -324,8 +341,9 @@ def get_prompt_pdf(tipo_atividade: str):
     elif tipo_atividade == "C":
         return PromptTemplate.from_template(
             """
-                    Você é um professor de Ensino Superior e precisa elaborar questões discursivas.                     
-
+                    Você é um professor de Ensino Superior e precisa elaborar questões discursivas.   
+                    {conteudo_sensivel}                     
+                     {nivel}
                                          Siga o seguinte raciocínio passo a passo:
 
                                          1. Analise o conteúdo fornecido abaixo e identifique os conceitos mais relevantes
@@ -338,7 +356,6 @@ def get_prompt_pdf(tipo_atividade: str):
                                          8. Gere exatamente {quantidade} questões
                                          9. Não informe no enunciado o tamanho da resposta do aluno
                                          10. Evite copiar diretamente o conteúdo original. Não mencione nomes de documentos ou fontes no enunciado.
-                                         11. Na elaboração considere também as informações abaixo:
 
                                          {infos_extras}
                                         
@@ -346,7 +363,7 @@ def get_prompt_pdf(tipo_atividade: str):
                                         Conteúdo de base:
                                          {input}
                     
-                                         Apresente a atividade no seguinte formato:
+                                         Apresente a atividade no seguinte formato (não exiba mensagem de saudação):
                                          inserir uma linha horizontal
                                          **Nome da atividade:**
 
@@ -360,8 +377,9 @@ def get_prompt_pdf(tipo_atividade: str):
         return PromptTemplate.from_template(
             """
          Você é um professor de Ensino Superior e precisa elaborar o enunciado de {quantidade} atividade do tipo 
-          Mapa mental  para avaliação.                     
-
+          Mapa mental  para avaliação.    
+          {conteudo_sensivel}                    
+             {nivel}
                                Siga o seguinte raciocínio passo a passo:
 
                                1. Analise o conteúdo fornecido abaixo e identifique os conceitos mais relevantes
@@ -372,14 +390,13 @@ def get_prompt_pdf(tipo_atividade: str):
                                6. Elabore um padrão de resposta em formato de tópicos que deverá aparecer no mapa mental
                                7. O padrão de resposta será usado pelo professor para a correção da atividade.
                                8. Evite copiar diretamente o conteúdo original. Não mencione nomes de documentos ou fontes no enunciado.
-                               9. Na elaboração considere também as informações abaixo:
                                
                                {infos_extras}
 
                                Conteúdo de base:
                                 {input}
                                 
-                               Apresente a atividade no seguinte formato:
+                               Apresente a atividade no seguinte formato (não exiba mensagem de saudação):
                                inserir uma linha horizontal
                                **Nome da atividade:**
 

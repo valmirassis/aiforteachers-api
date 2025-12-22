@@ -14,17 +14,26 @@ client = genai.Client()
 
 LLM_GEMINI = os.getenv("LLM_GEMINI")
 embedding_model = GoogleGenerativeAIEmbeddings(model=os.getenv("EMBEDDING_MODEL"))
-
+sensitive_content = """Analise o texto fornecido e verifique se ele contém qualquer tipo de conteúdo sensível, incluindo, mas não se limitando a:
+                        - conteúdo sexual explícito ou implícito;
+                        - violência física, psicológica ou sexual;
+                        - abuso, exploração ou assédio;
+                        - linguagem sexualizada ou violenta.
+                        Se qualquer conteúdo sensível for identificado, retorne APENAS a mensagem:
+                           ERRO: O texto contém conteúdo sensível e não pode ser processado."""
 
 def gerar_roteiro_tema(tema: str, tipo: str, tempo: str, infos_extras: str):
     # 1. Obter e formatar o prompt
     prompt_template = get_prompt_tema(tipo)
+    if infos_extras and infos_extras.strip():
+        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
 
     # 2. Criar a string final do prompt
     final_prompt = prompt_template.format(
         tema=tema,
         infos_extras=infos_extras,
         tempo=tempo,
+        conteudo_sensivel=sensitive_content
 
     )
     # 3. Chamar o SDK Nativo com a configuração de raciocínio
@@ -37,7 +46,7 @@ def gerar_roteiro_tema(tema: str, tipo: str, tempo: str, infos_extras: str):
                 max_output_tokens=8192,
 
                 thinking_config=types.ThinkingConfig(
-                    thinking_budget=0  # <-- DESATIVA O RACIOCÍNIO
+                    thinking_budget=0  # DESATIVA O RACIOCÍNIO
                 ),
                 temperature=0.4
             )
@@ -96,12 +105,14 @@ def gerar_roteiro_pdf(arquivo, tipo: str, tempo: int, consulta: str, infos_extra
         texto_base = "\n".join(chunk.page_content for chunk in chunks_relevantes)
 
     prompt_template = get_prompt_pdf(tipo)
-
+    if infos_extras and infos_extras.strip():
+        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
     # 2. Criar a string final do prompt
     final_prompt = prompt_template.format(
         input=texto_base,
         infos_extras=infos_extras,
         tempo=tempo,
+        conteudo_sensivel=sensitive_content
 
     )
     # 3. Chamar o SDK Nativo com a configuração de raciocínio
@@ -129,7 +140,8 @@ def get_prompt_tema(tipo_roteiro: str):
         return PromptTemplate.from_template(
             """
           Você é um professor de Ensino Superior e precisa elaborar o roteiro para a construção de uma apresentação de
-          slides, a apresentação deverá ter {tempo} slides.                     
+          slides, a apresentação deverá ter {tempo} slides.     
+          {conteudo_sensivel}                   
 
                    Siga o seguinte raciocínio passo a passo:
 
@@ -138,14 +150,12 @@ def get_prompt_tema(tipo_roteiro: str):
                    3. Elabore os tópicos para os slides de forma contextualizada e baseada nesse conceito.
                    4. Defina um nome para a apresentação com base no contexto dela.
                    5. O roteiro deve ser construído para exatamente {tempo} slides.
-                   6. Na elaboração do roteiro considere também as informações abaixo:
+                    
+                    {infos_extras}
+                    
+                   Tema da apresentação:  {tema}
 
-                   {infos_extras}
-
-                   Tema da apresentação:
-                   {tema}
-
-                   Apresente o roteiro no seguinte formato:
+                   Apresente o roteiro no seguinte formato (não exiba mensagem de saudação):
                   
                    **Nome da apresentação:**
                    
@@ -162,7 +172,8 @@ def get_prompt_tema(tipo_roteiro: str):
         return PromptTemplate.from_template(
             """
           Você é um professor de Ensino Superior e precisa elaborar o roteiro para a construção de uma aula,
-          a aula deverá ter {tempo} minutos.                     
+          a aula deverá ter {tempo} minutos.   
+          {conteudo_sensivel}                     
 
                    Siga o seguinte raciocínio passo a passo:
 
@@ -172,14 +183,12 @@ def get_prompt_tema(tipo_roteiro: str):
                    4. Defina um nome para a aula com base no contexto dela.
                    5. O roteiro deve ser construído para exatamente {tempo} minutos de aula.
                    6. Mostrar os itens a serem trabalhados em formato de tópicos.
-                   7. Na elaboração do roteiro considere também as informações abaixo:
 
                    {infos_extras}
+                   
+                   Tema da aula: {tema}
 
-                   Tema da aula:
-                   {tema}
-
-                   Apresente o roteiro no seguinte formato:
+                   Apresente o roteiro no seguinte formato (não exiba mensagem de saudação):
            
                    **Nome da aula:**
                    
@@ -193,7 +202,8 @@ def get_prompt_tema(tipo_roteiro: str):
         return PromptTemplate.from_template(
             """
            Você é um professor de Ensino Superior e precisa elaborar o roteiro para a construção de uma vídeo-aula
-          a vídeo-aula deverá ter {tempo} minutos.                     
+          a vídeo-aula deverá ter {tempo} minutos.  
+          {conteudo_sensivel}                      
 
                    Siga o seguinte raciocínio passo a passo:
 
@@ -203,14 +213,13 @@ def get_prompt_tema(tipo_roteiro: str):
                    4. Defina um nome para o vídeo com base no contexto dela.
                    5. O roteiro deve ser construído para exatamente {tempo} minutos de vídeo.
                    6. Mostrar os itens a serem trabalhados em formato de tópicos.
-                   7. Na elaboração do roteiro considere também as informações abaixo:
 
                    {infos_extras}
 
                    Tema da vídeo aula:
                    {tema}
 
-                   Apresente o roteiro no seguinte formato:
+                   Apresente o roteiro no seguinte formato (não exiba mensagem de saudação):
                
                    **Nome da vídeo aula:**
                    
@@ -229,7 +238,8 @@ def get_prompt_pdf(tipo_roteiro: str):
         return PromptTemplate.from_template(
             """
           Você é um professor de Ensino Superior e precisa elaborar o roteiro para a construção de uma apresentação de
-          slides, a apresentação deverá ter {tempo} slides.                     
+          slides, a apresentação deverá ter {tempo} slides.    
+          {conteudo_sensivel}                    
 
                    Siga o seguinte raciocínio passo a passo:
 
@@ -238,14 +248,12 @@ def get_prompt_pdf(tipo_roteiro: str):
                    3. Elabore os tópicos para os slides de forma contextualizada e baseada nesse conceito.
                    4. Defina um nome para a apresentação com base no contexto dela.
                    5. O roteiro deve ser construído para exatamente {tempo} slides.
-                   6. Na elaboração do roteiro considere também as informações abaixo:
-
                    {infos_extras}
 
                    Tema da apresentação:
                    {input}
 
-                   Apresente o roteiro no seguinte formato:
+                   Apresente o roteiro no seguinte formato (não exiba mensagem de saudação):
                
                    **Nome da apresentação:**
                    
@@ -262,7 +270,8 @@ def get_prompt_pdf(tipo_roteiro: str):
         return PromptTemplate.from_template(
             """
            Você é um professor de Ensino Superior e precisa elaborar o roteiro para a construção de uma aula,
-           a aula deverá ter {tempo} minutos.                     
+           a aula deverá ter {tempo} minutos.      
+           {conteudo_sensivel}                  
 
                     Siga o seguinte raciocínio passo a passo:
 
@@ -272,14 +281,13 @@ def get_prompt_pdf(tipo_roteiro: str):
                     4. Defina um nome para a aula com base no contexto dela.
                     5. O roteiro deve ser construído para exatamente {tempo} minutos de aula.
                     6. Mostrar os itens a serem trabalhados em formato de tópicos.
-                    7. Na elaboração do roteiro considere também as informações abaixo:
 
                     {infos_extras}
 
                     Tema da aula:
                     {input}
 
-                    Apresente o roteiro no seguinte formato:
+                    Apresente o roteiro no seguinte formato (não exiba mensagem de saudação):
                  
                     **Nome da aula:**
                     
@@ -294,7 +302,8 @@ def get_prompt_pdf(tipo_roteiro: str):
         return PromptTemplate.from_template(
             """
            Você é um professor de Ensino Superior e precisa elaborar o roteiro para a construção de uma vídeo-aula,
-          a vídeo-aula deverá ter {tempo} minutos.                     
+          a vídeo-aula deverá ter {tempo} minutos.  
+          {conteudo_sensivel}                      
 
                    Siga o seguinte raciocínio passo a passo:
 
@@ -304,14 +313,12 @@ def get_prompt_pdf(tipo_roteiro: str):
                    4. Defina um nome para o vídeo com base no contexto dela.
                    5. O roteiro deve ser construído para exatamente {tempo} minutos de vídeo.
                    6. Mostrar os itens a serem trabalhados em formato de tópicos.
-                   7. Na elaboração do roteiro considere também as informações abaixo:
-
                    {infos_extras}
 
                    Tema da vídeo aula:
                    {input}
 
-                   Apresente o roteiro no seguinte formato:
+                   Apresente o roteiro no seguinte formato (não exiba mensagem de saudação):
              
                    **Nome da vídeo aula:**
                    

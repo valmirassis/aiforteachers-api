@@ -14,7 +14,13 @@ client = genai.Client()
 
 LLM_GEMINI = os.getenv("LLM_GEMINI")
 embedding_model = GoogleGenerativeAIEmbeddings(model=os.getenv("EMBEDDING_MODEL"))
-
+sensitive_content = """Analise o texto fornecido e verifique se ele contém qualquer tipo de conteúdo sensível, incluindo, mas não se limitando a:
+                        - conteúdo sexual explícito ou implícito;
+                        - violência física, psicológica ou sexual;
+                        - abuso, exploração ou assédio;
+                        - linguagem sexualizada ou violenta.
+                        Se qualquer conteúdo sensível for identificado, retorne APENAS a mensagem:
+                           ERRO: O texto contém conteúdo sensível e não pode ser processado."""
 def transformar_texto(final_prompt):
     # 3. Chamar o SDK Nativo com a configuração de raciocínio
     try:
@@ -37,24 +43,24 @@ def transformar_texto(final_prompt):
     # Operações
 def traduzir(texto: str, tipo: str, idioma: str, infos_extras: str):
     # 1. Obter e formatar o prompt
-    if infos_extras != "":
-        infos_extras = f"""Na tradução considere também as informações a seguir:
-                      {infos_extras}"""
+    if infos_extras and infos_extras.strip():
+        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
+
     prompt_template = get_prompt(tipo)
 
     # 2. Criar a string final do prompt
     final_prompt = prompt_template.format(
         texto=texto,
         infos_extras=infos_extras,
-        idioma=idioma
+        idioma=idioma,
+        conteudo_sensivel=sensitive_content
     )
     return transformar_texto(final_prompt)
 
 def reescrever(texto: str, tipo: str, tom: str, infos_extras: str):
     # 1. Obter e formatar o prompt
-    if infos_extras != "":
-        infos_extras = f"""Na reescrita considere também as informações a seguir:
-                   {infos_extras}"""
+    if infos_extras and infos_extras.strip():
+        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
 
     prompt_template = get_prompt(tipo)
 
@@ -63,7 +69,8 @@ def reescrever(texto: str, tipo: str, tom: str, infos_extras: str):
     final_prompt = prompt_template.format(
         texto=texto,
         infos_extras=infos_extras,
-        tom=tom
+        tom=tom,
+        conteudo_sensivel=sensitive_content
     )
     return transformar_texto(final_prompt)
 def resumir(texto: str, tipo: str, formato: str, infos_extras: str):
@@ -79,13 +86,13 @@ def resumir(texto: str, tipo: str, formato: str, infos_extras: str):
     final_prompt = prompt_template.format(
         texto=texto,
         infos_extras=infos_extras,
-        formato=formato
+        formato=formato,
+        conteudo_sensivel=sensitive_content
     )
     return transformar_texto(final_prompt)
 def revisar(texto: str, tipo: str, infos_extras: str):
-    if infos_extras != "":
-        infos_extras = f"""Na revisão considere também as informações a seguir:
-                      {infos_extras}"""
+    if infos_extras and infos_extras.strip():
+        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
     # 1. Obter e formatar o prompt
     prompt_template = get_prompt(tipo)
 
@@ -93,13 +100,13 @@ def revisar(texto: str, tipo: str, infos_extras: str):
     final_prompt = prompt_template.format(
         texto=texto,
         infos_extras=infos_extras,
+        conteudo_sensivel=sensitive_content
     )
     return transformar_texto(final_prompt)
 
 def expandir(texto: str, tipo: str, quantidade: int, infos_extras: str):
-    if infos_extras != "":
-        infos_extras = f"""Na expansão considere também as informações a seguir:
-                      {infos_extras}"""
+    if infos_extras and infos_extras.strip():
+        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
     # 1. Obter e formatar o prompt
     prompt_template = get_prompt(tipo)
 
@@ -107,14 +114,14 @@ def expandir(texto: str, tipo: str, quantidade: int, infos_extras: str):
     final_prompt = prompt_template.format(
         texto=texto,
         infos_extras=infos_extras,
-        quantidade=quantidade
+        quantidade=quantidade,
+        conteudo_sensivel=sensitive_content
     )
     return transformar_texto(final_prompt)
 
 def criar(tema: str, tipo: str, quantidade: int, formato: str, infos_extras: str):
-    if infos_extras != "":
-        infos_extras = f"""Na criação considere também as informações a seguir:
-                      {infos_extras}"""
+    if infos_extras and infos_extras.strip():
+        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
     # 1. Obter e formatar o prompt
     prompt_template = get_prompt(tipo)
 
@@ -123,14 +130,14 @@ def criar(tema: str, tipo: str, quantidade: int, formato: str, infos_extras: str
         texto=tema,
         infos_extras=infos_extras,
         formato=formato,
-        quantidade=quantidade
+        quantidade=quantidade,
+        conteudo_sensivel=sensitive_content
     )
     return transformar_texto(final_prompt)
 
 def resumirPDF(arquivo, tipo: str, formato: str, infos_extras: str):
-    if infos_extras != "":
-        infos_extras = f"""Na criação considere também as informações a seguir:
-                         {infos_extras}"""
+    if infos_extras and infos_extras.strip():
+        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
     consulta = ""
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
         tmp_file.write(arquivo)
@@ -161,7 +168,8 @@ def resumirPDF(arquivo, tipo: str, formato: str, infos_extras: str):
     final_prompt = prompt_template.format(
         texto=texto,
         infos_extras=infos_extras,
-        formato=formato
+        formato=formato,
+        conteudo_sensivel=sensitive_content
     )
     return transformar_texto(final_prompt)
 
@@ -169,8 +177,11 @@ def get_prompt(tipo: str):
     if tipo == "A":
         return PromptTemplate.from_template(
             """
-                   Você é um tradutor e precisa traduzir o texto a seguir.                   
+                   Você é um tradutor e precisa traduzir o texto a seguir. 
+                                                        
                    Siga o seguinte raciocínio passo a passo:
+                     
+                   {conteudo_sensivel}   
 
                    1. Analise o text fornecido a seguir.
                    2. Traduza para o idioma informado.
@@ -193,6 +204,7 @@ def get_prompt(tipo: str):
               """
                     Reescreva o texto a seguir de forma direta sem análises ou saudações.                   
                    Siga o seguinte raciocínio passo a passo:
+                   {conteudo_sensivel}
 
                    1. Analise o text fornecido a seguir.
                    2. Reescreva o texto com o tom {tom}
@@ -213,6 +225,7 @@ def get_prompt(tipo: str):
             """
              Resuma o texto a seguir de forma direta sem análises ou saudações.                   
                    Siga o seguinte raciocínio passo a passo:
+                   {conteudo_sensivel}
 
                    1. Analise o texto fornecido a seguir.
                    2. Resuma o texto no formato {formato}
@@ -233,6 +246,7 @@ def get_prompt(tipo: str):
             """
              Resuma o texto a seguir de forma direta sem análises ou saudações.                   
                    Siga o seguinte raciocínio passo a passo:
+                   {conteudo_sensivel}
 
                    1. Analise o texto fornecido a seguir.
                    2. Resuma o texto no formato {formato}
@@ -254,6 +268,7 @@ def get_prompt(tipo: str):
             """
                           Você é um professor e precisa revisar e corrigir o texto seguir.                   
                           Siga o seguinte raciocínio passo a passo:
+                          {conteudo_sensivel}
     
                           1. Analise o texto fornecido a seguir.
                           2. Reescreva o texto revisando e corrigindo.
@@ -275,21 +290,25 @@ def get_prompt(tipo: str):
         return PromptTemplate.from_template(
 
             """
-                          Você é um professor e precisa expandir o texto seguir.                   
-                          Siga o seguinte raciocínio passo a passo:
+            Você é um professor e precisa expandir o texto a seguir
+                          Siga rigorosamente as instruções abaixo:
+                          {conteudo_sensivel}
 
-                          1. Analise o texto fornecido a seguir.
-                          2. Reescreva o texto expandindo-o, considere a quantidade de caracteres fornecida para expandir
-                          3. Mantenha o contexto do texto.            
-                          4. Não exiba mensagens de saudação, apenas apresente o texto expandido.
+                        1. Analise o texto original mantendo integralmente seu contexto, tema e objetivo.
+                        2. Reescreva o texto de forma expandida, acrescentando aproximadamente {quantidade} palavras em relação ao texto original.
+                        3. A expansão deve ocorrer por meio de:
+                           - maior detalhamento das ideias já presentes,
+                           - explicitação de conceitos implícitos,
+                           - inclusão de exemplos explicativos quando pertinente,
+                           sem introduzir novos tópicos ou alterar o sentido do texto.
+                        4. O texto final pode variar até ±10% da quantidade de palavras solicitada.
+                        5. Não repita frases do texto original de forma redundante.
+                        6. Não apresente comentários, explicações, saudações ou marcações adicionais.
                       
                           {infos_extras}
-
-                          Texto a ser revisto e corrigido:
+                          Texto a ser ser expandido:
                           {texto}
-
-                          Aumente até: {quantidade} de caracteres com espaço.
-
+                   
                           **Texto expandido**:
         
                                """
@@ -300,20 +319,21 @@ def get_prompt(tipo: str):
             """
                           Você é um professor e precisa criar o texto seguir.                   
                           Siga o seguinte raciocínio passo a passo:
+                          {conteudo_sensivel}
 
                           1. Analise o tema fornecido a seguir.
-                          2. Crie um texto contextualizado sobre o tema respeitanto do formato e quantidade de caracteres fornecidos.
+                          2. Crie um texto contextualizado sobre o tema respeitanto com aproximadamente {quantidade} de palavras
                           3. Mantenha uma estrutura organizada.
-                          4. Não exiba mensagens de saudação, apenas apresente o texto gerado
+                          4. Não apresente comentários, explicações, saudações ou marcações adicionais.
                         
                           {infos_extras}
 
                           Tema do texto a ser criado:
                           {texto}
-                          Tamanho do texto: Até {quantidade} caracteres com espaço;
+                          
                           Formato do texto: {formato}
 
-                          **Texto expandido**:
+                          **Texto criado**:
 
                                """
         )

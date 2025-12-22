@@ -21,7 +21,7 @@ def describe_image(
     mime_type: str,
     idioma_saida: str = "pt-BR",
     tom: str = "neutro",
-    quantidade_caracteres: int = 160,
+    quantidade_palavras: int = 160,
 ) -> Dict[str, Any]:
     """Gera descrição acessível para uma imagem usando o llm global."""
 
@@ -37,7 +37,7 @@ def describe_image(
         "Responda SEMPRE em JSON válido, seguindo exatamente este esquema:\n\n"
         "{\n"
         f'  "alt_text": "string curta (até 160 caracteres)",\n'
-        f'  "descricao_longa": "parágrafo(s) objetivo(s), até {quantidade_caracteres}  caracteres (contando espaços).",\n'
+        f'  "descricao_longa": "parágrafo(s) objetivo(s), até {quantidade_palavras}  palavras.",\n'
         '  "texto_detectado": "texto OCR se houver",\n'
         '  "tags": ["3 a 10 palavras-chave"],\n'
         '  "seguranca": {\n'

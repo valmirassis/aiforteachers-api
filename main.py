@@ -58,12 +58,13 @@ def atividade_tema(
     tema: str = Form(...),
     tipo: str = Form(...),
     quantidade: str = Form(...),
-    infos_extras: str = Form("")
+    infos_extras: str = Form(""),
+    nivel: str = Form("")
 ):
     if token != API_TOKEN:
         raise HTTPException(status_code=401, detail="Token inválido")
-    atividade = gerar_atividade_tema(tema, tipo, infos_extras, quantidade)
-    return {"tipo": tipo, "tema": tema, "atividade": atividade}
+    atividade = gerar_atividade_tema(tema, tipo, infos_extras, quantidade, nivel)
+    return {"tipo": tipo, "tema": tema, "nivel": nivel,"atividade": atividade}
 
 @app.post("/gerar-atividade-pdf")
 def atividade_pdf(
@@ -71,14 +72,15 @@ def atividade_pdf(
     tipo: str = Form(...),
     quantidade: str = Form(...),
     infos_extras: str = Form(...),
+    nivel: str = Form(""),
     consulta: str = Form(""),
     arquivo: UploadFile = File(...)
 ):
     if token != API_TOKEN:
         raise HTTPException(status_code=401, detail="Token inválido")
     conteudo = arquivo.file.read()
-    atividade = gerar_atividade_pdf(conteudo, tipo, quantidade, consulta, infos_extras)
-    return {"tipo": tipo, "tema": "Baseado em arquivo", "atividade": atividade}
+    atividade = gerar_atividade_pdf(conteudo, tipo, quantidade, nivel, consulta, infos_extras)
+    return {"tipo": tipo, "tema": "Baseado em arquivo", "nivel": nivel, "atividade": atividade}
 
 # ------- GERADOR DE ROTEIRO  -----------------------
 @app.post("/gerar-roteiro-tema")
@@ -202,7 +204,7 @@ def descrever_imagem(
     token: str = Form(...),
     idioma_saida: str = Form("pt-BR"),
     tom: str = Form("neutro"),
-    quantidade_caracteres: int = Form(...),
+    quantidade_palavras: int = Form(...),
     arquivo: UploadFile = File(...)
 ):
     if token != API_TOKEN:
@@ -222,7 +224,7 @@ def descrever_imagem(
         mime_type=mime,
         idioma_saida=idioma_saida,
         tom=tom,
-        quantidade_caracteres=quantidade_caracteres
+        quantidade_palavras=quantidade_palavras
     )
 
     return {"descricao": resultado}

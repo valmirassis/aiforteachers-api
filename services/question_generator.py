@@ -15,7 +15,13 @@ client = genai.Client()
 
 LLM_GEMINI = os.getenv("LLM_GEMINI")
 embedding_model = GoogleGenerativeAIEmbeddings(model=os.getenv("EMBEDDING_MODEL"))
-
+sensitive_content = """Analise o texto fornecido e verifique se ele contém qualquer tipo de conteúdo sensível, incluindo, mas não se limitando a:
+                        - conteúdo sexual explícito ou implícito;
+                        - violência física, psicológica ou sexual;
+                        - abuso, exploração ou assédio;
+                        - linguagem sexualizada ou violenta.
+                        Se qualquer conteúdo sensível for identificado, retorne APENAS a mensagem:
+                           ERRO: O texto contém conteúdo sensível e não pode ser processado."""
 
 def gerar_questoes_tema(tema: str, tipo: str, qtd: int, dificuldade: str):
     info_dificuldade = ""
@@ -33,7 +39,8 @@ def gerar_questoes_tema(tema: str, tipo: str, qtd: int, dificuldade: str):
     final_prompt = prompt_template.format(
         input=tema,
         quantidade=qtd,
-        dificuldade=info_dificuldade
+        dificuldade=info_dificuldade,
+        conteudo_sensivel=sensitive_content
     )
 
     # 3. Chamar o SDK Nativo com a configuração de raciocínio
@@ -116,7 +123,8 @@ def gerar_questoes_pdf(arquivo, tipo: str, qtd: int, consulta: str, dificuldade:
     final_prompt = prompt_template.format(
         input=texto_base,
         quantidade=qtd,
-        dificuldade=info_dificuldade
+        dificuldade=info_dificuldade,
+        conteudo_sensivel=sensitive_content
     )
     try:
         response = client.models.generate_content(
@@ -145,6 +153,7 @@ def get_prompt_tema(tipo_questao: str):
                       de múltipla escolha para avaliação.                     
 
                      Siga o seguinte raciocínio passo a passo:
+                     {conteudo_sensivel}   
 
                      1. Analise o tema fornecido abaixo.
                      2. Escolha um conceito central sobre o tema que possa ser avaliado com uma pergunta objetiva.
@@ -194,6 +203,7 @@ def get_prompt_tema(tipo_questao: str):
             """
          Você é um professor de Ensino Superior e precisa elaborar exatamente {quantidade} questão(ões) 
                         de múltipla escolha com afirmativas.
+                        {conteudo_sensivel}   
 
                         Siga o seguinte raciocínio passo a passo:
 
@@ -251,6 +261,7 @@ def get_prompt_tema(tipo_questao: str):
             """
              Você é um professor de Ensino Superior e precisa elaborar {quantidade} questão(ões) 
                         do tipo múltipla escolha com estrutura de asserção e razão.
+                        {conteudo_sensivel}   
 
                         Siga o seguinte raciocínio passo a passo:
 
@@ -311,7 +322,8 @@ def get_prompt_pdf(tipo_questao: str):
         return PromptTemplate.from_template(
             """
                   Você é um professor de Ensino Superior e precisa elaborar {quantidade} questão(ões)
-                   de múltipla escolha para avaliação.                     
+                   de múltipla escolha para avaliação.  
+                   {conteudo_sensivel}                      
 
                   Siga o seguinte raciocínio passo a passo:
 
@@ -364,6 +376,7 @@ def get_prompt_pdf(tipo_questao: str):
             """
                        Você é um professor de Ensino Superior e precisa elaborar exatamente {quantidade} questão(ões) 
                        de múltipla escolha com afirmativas.
+                       {conteudo_sensivel}   
 
                        Siga o seguinte raciocínio passo a passo:
 
@@ -423,6 +436,7 @@ def get_prompt_pdf(tipo_questao: str):
             """
                                   Você é um professor de Ensino Superior e precisa elaborar {quantidade} questão(ões) 
                                   do tipo múltipla escolha com estrutura de asserção e razão.
+                                  {conteudo_sensivel}   
 
                                   Siga o seguinte raciocínio passo a passo:
 
