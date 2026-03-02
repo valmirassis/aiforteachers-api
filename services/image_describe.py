@@ -30,7 +30,32 @@ def describe_image(
     if not mime_type.startswith("image/"):
         raise ValueError("Mime-type inválido. Envie uma imagem.")
 
-    sys_prompt = (
+    sys_prompt = f"""
+    Você é um assistente que gera descrições acessíveis de imagens (alt-text e descrição longa).
+    Não invente detalhes: quando algo não for visível, declare que não é possível inferir.
+    Se existir texto na imagem, transcreva em "texto_detectado".
+    Responda SEMPRE em JSON válido, seguindo exatamente este esquema:
+
+    {{
+      "alt_text": "string curta (até 160 caracteres)",
+      "descricao_longa": "parágrafo(s) objetivo(s), até {quantidade_palavras} palavras.",
+      "texto_detectado": "texto OCR se houver",
+      "tags": ["3 a 10 palavras-chave"],
+      "seguranca": {{
+          "nudes_suspeita": false,
+          "violencia_suspeita": false,
+          "info_pessoal_suspeita": false,
+          "menor_em_contexto_sensivel": false,
+          "pessoa_em_situacao_de_vulnerabilidade": false
+      }}
+    }}
+
+    Idioma de saída: {idioma_saida}.
+    Tom: {tom}.
+    Imagem: "".
+    """.strip()
+
+    sys_prompt2 = (
         "Você é um assistente que gera descrições acessíveis de imagens (alt-text e descrição longa). "
         "Não invente detalhes: quando algo não for visível, declare que não é possível inferir. "
         "Se existir texto na imagem, transcreva em 'texto_detectado'. "
@@ -50,7 +75,6 @@ def describe_image(
         f"Tom: {tom}.\n"
         f"Imagem: ''.\n"
     )
-
     user_text = "Descreva a imagem para alguém que não pode ver.\nResponda somente com o JSON especificado."
 
     msg = HumanMessage(

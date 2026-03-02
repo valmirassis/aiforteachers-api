@@ -20,8 +20,10 @@ sensitive_content = """Analise o texto fornecido e verifique se ele contém qual
                         - violência física, psicológica ou sexual;
                         - abuso, exploração ou assédio;
                         - linguagem sexualizada ou violenta.
+                        - linguagem preconceituosa contra minorias.
                         Se qualquer conteúdo sensível for identificado, retorne APENAS a mensagem:
-                           ERRO: O texto contém conteúdo sensível e não pode ser processado."""
+                           ERRO: A solicitação contém conteúdo sensível e não pode ser processada.
+                           """
 
 def gerar_questoes_tema(tema: str, tipo: str, qtd: int, dificuldade: str):
     info_dificuldade = ""

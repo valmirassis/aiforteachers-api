@@ -19,8 +19,10 @@ sensitive_content = """Analise o texto fornecido e verifique se ele contém qual
                         - violência física, psicológica ou sexual;
                         - abuso, exploração ou assédio;
                         - linguagem sexualizada ou violenta.
+                        - linguagem preconceituosa contra minorias.
                         Se qualquer conteúdo sensível for identificado, retorne APENAS a mensagem:
-                           ERRO: O texto contém conteúdo sensível e não pode ser processado."""
+                           ERRO: A solicitação contém conteúdo sensível e não pode ser processada.
+                           """
 def gerar_atividade_tema(tema: str, tipo: str, quantidade: str, nivel: str, infos_extras: str):
     # 1. Obter e formatar o prompt
     prompt_template = get_prompt_tema(tipo)
@@ -321,7 +323,8 @@ def get_prompt_pdf(tipo_atividade: str):
                                4. O enunciado deve ter pelo menos 100 palavras.
                                5. Defina um nome para a atividade com base no contexto dela.
                                6. Elabore um padrão de resposta em formato de tabela que será usado pelo professor para a correção da atividade.
-                               7. Evite copiar diretamente o conteúdo original. Não mencione nomes de documentos ou fontes no enunciado.
+                               7. O padrão de resposta deve ter 
+                               8. Evite copiar diretamente o conteúdo original. Não mencione nomes de documentos ou fontes no enunciado.
                                
                                {infos_extras}
 

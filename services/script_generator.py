@@ -19,9 +19,10 @@ sensitive_content = """Analise o texto fornecido e verifique se ele contém qual
                         - violência física, psicológica ou sexual;
                         - abuso, exploração ou assédio;
                         - linguagem sexualizada ou violenta.
+                        - linguagem preconceituosa contra minorias.
                         Se qualquer conteúdo sensível for identificado, retorne APENAS a mensagem:
-                           ERRO: O texto contém conteúdo sensível e não pode ser processado."""
-
+                           ERRO: A solicitação contém conteúdo sensível e não pode ser processada.
+                           """
 def gerar_roteiro_tema(tema: str, tipo: str, tempo: str, infos_extras: str):
     # 1. Obter e formatar o prompt
     prompt_template = get_prompt_tema(tipo)
@@ -244,13 +245,13 @@ def get_prompt_pdf(tipo_roteiro: str):
                    Siga o seguinte raciocínio passo a passo:
 
                    1. Analise o conteúdo fornecido abaixo e identifique os conceitos mais relevantes.
-                   2. Escolha um conceito central sobre o tema que possa ser usado para a construção da apresentação.
+                   2. Escolha um conceito central sobre o conteúdo que possa ser usado para a construção da apresentação.
                    3. Elabore os tópicos para os slides de forma contextualizada e baseada nesse conceito.
                    4. Defina um nome para a apresentação com base no contexto dela.
                    5. O roteiro deve ser construído para exatamente {tempo} slides.
                    {infos_extras}
 
-                   Tema da apresentação:
+                   Conteúdo para realizar a apresentação:
                    {input}
 
                    Apresente o roteiro no seguinte formato (não exiba mensagem de saudação):
@@ -275,8 +276,8 @@ def get_prompt_pdf(tipo_roteiro: str):
 
                     Siga o seguinte raciocínio passo a passo:
 
-                    1. Analise o tema fornecido abaixo.
-                    2. Escolha um conceito central sobre o tema que possa ser usado para ministrar uma aula.
+                    1. Analise o conteúdo fornecido abaixo.
+                    2. Escolha um conceito central sobre o conteúdo que possa ser usado para ministrar uma aula.
                     3. Elabore os tópicos para a aula de forma contextualizada e baseada nesse conceito.
                     4. Defina um nome para a aula com base no contexto dela.
                     5. O roteiro deve ser construído para exatamente {tempo} minutos de aula.
@@ -284,7 +285,7 @@ def get_prompt_pdf(tipo_roteiro: str):
 
                     {infos_extras}
 
-                    Tema da aula:
+                    Conteúdo da aula:
                     {input}
 
                     Apresente o roteiro no seguinte formato (não exiba mensagem de saudação):
@@ -308,14 +309,14 @@ def get_prompt_pdf(tipo_roteiro: str):
                    Siga o seguinte raciocínio passo a passo:
 
                    1. Analise o conteúdo fornecido abaixo e identifique os conceitos mais relevantes
-                   2. Escolha um conceito central sobre o tema que possa ser usado para gravação do vídeo.
+                   2. Escolha um conceito central sobre o conteúdo que possa ser usado para gravação do vídeo.
                    3. Elabore os tópicos para o vídeo de forma contextualizada e baseada nesse conceito.
                    4. Defina um nome para o vídeo com base no contexto dela.
                    5. O roteiro deve ser construído para exatamente {tempo} minutos de vídeo.
                    6. Mostrar os itens a serem trabalhados em formato de tópicos.
                    {infos_extras}
 
-                   Tema da vídeo aula:
+                   Conteúdo da vídeo aula:
                    {input}
 
                    Apresente o roteiro no seguinte formato (não exiba mensagem de saudação):

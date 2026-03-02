@@ -19,8 +19,10 @@ sensitive_content = """Analise o texto fornecido e verifique se ele contém qual
                         - violência física, psicológica ou sexual;
                         - abuso, exploração ou assédio;
                         - linguagem sexualizada ou violenta.
+                        - linguagem preconceituosa contra minorias.
                         Se qualquer conteúdo sensível for identificado, retorne APENAS a mensagem:
-                           ERRO: O texto contém conteúdo sensível e não pode ser processado."""
+                           ERRO: A solicitação contém conteúdo sensível e não pode ser processada.
+                           """
 def transformar_texto(final_prompt):
     # 3. Chamar o SDK Nativo com a configuração de raciocínio
     try:
@@ -92,7 +94,7 @@ def resumir(texto: str, tipo: str, formato: str, infos_extras: str):
     return transformar_texto(final_prompt)
 def revisar(texto: str, tipo: str, infos_extras: str):
     if infos_extras and infos_extras.strip():
-        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
+        infos_extras = f"Na revisão do texto considere também as informações abaixo: {infos_extras}"
     # 1. Obter e formatar o prompt
     prompt_template = get_prompt(tipo)
 
@@ -106,7 +108,7 @@ def revisar(texto: str, tipo: str, infos_extras: str):
 
 def expandir(texto: str, tipo: str, quantidade: int, infos_extras: str):
     if infos_extras and infos_extras.strip():
-        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
+        infos_extras = f"Na expansão do texto considere também as informações abaixo: {infos_extras}"
     # 1. Obter e formatar o prompt
     prompt_template = get_prompt(tipo)
 
@@ -121,7 +123,7 @@ def expandir(texto: str, tipo: str, quantidade: int, infos_extras: str):
 
 def criar(tema: str, tipo: str, quantidade: int, formato: str, infos_extras: str):
     if infos_extras and infos_extras.strip():
-        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
+        infos_extras = f"Na criação do roteiro considere também as informações abaixo: {infos_extras}"
     # 1. Obter e formatar o prompt
     prompt_template = get_prompt(tipo)
 
@@ -137,7 +139,7 @@ def criar(tema: str, tipo: str, quantidade: int, formato: str, infos_extras: str
 
 def resumirPDF(arquivo, tipo: str, formato: str, infos_extras: str):
     if infos_extras and infos_extras.strip():
-        infos_extras = f"Na elaboração do roteiro considere também as informações abaixo: {infos_extras}"
+        infos_extras = f"No resumo do texto considere também as informações abaixo: {infos_extras}"
     consulta = ""
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
         tmp_file.write(arquivo)
@@ -186,7 +188,8 @@ def get_prompt(tipo: str):
                    1. Analise o text fornecido a seguir.
                    2. Traduza para o idioma informado.
                    3. Mantenha o contexto do texto.
-                   4. Não exiba mensagens de saudação, apenas apresente o texto
+                   4. Não acrescente informações no texto.
+                   4. Não exiba mensagens de saudação, apenas apresente o texto traduzido.
                    
                    {infos_extras}
 
@@ -206,7 +209,7 @@ def get_prompt(tipo: str):
                    Siga o seguinte raciocínio passo a passo:
                    {conteudo_sensivel}
 
-                   1. Analise o text fornecido a seguir.
+                   1. Analise o texto fornecido a seguir.
                    2. Reescreva o texto com o tom {tom}
                    3. Mantenha o contexto do texto.
                    4. Não explique ou faça análises do texto, apenas reescreva de forma direta.
@@ -272,8 +275,10 @@ def get_prompt(tipo: str):
     
                           1. Analise o texto fornecido a seguir.
                           2. Reescreva o texto revisando e corrigindo.
-                          3. Mantenha o contexto do texto.
-                          4. Não exiba mensagens de saudação, apenas apresente o texto revisado e corrigido
+                          4. Corrija gráfia e concordância.
+                          4. Mantenha o contexto do texto.
+                          5. Não acrescente informações no texto
+                          6. Não exiba mensagens de saudação, apenas apresente o texto revisado e corrigido
                           
                           {infos_extras}
     
@@ -301,12 +306,12 @@ def get_prompt(tipo: str):
                            - explicitação de conceitos implícitos,
                            - inclusão de exemplos explicativos quando pertinente,
                            sem introduzir novos tópicos ou alterar o sentido do texto.
-                        4. O texto final pode variar até ±10% da quantidade de palavras solicitada.
+                        4. O texto final pode variar até ±10% da quantidade de palavras solicitadas.
                         5. Não repita frases do texto original de forma redundante.
                         6. Não apresente comentários, explicações, saudações ou marcações adicionais.
                       
                           {infos_extras}
-                          Texto a ser ser expandido:
+                          Texto a ser expandido:
                           {texto}
                    
                           **Texto expandido**:

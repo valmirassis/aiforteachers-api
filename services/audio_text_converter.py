@@ -7,11 +7,12 @@ from langchain_core.messages import HumanMessage
 load_dotenv()
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+LLM_GEMINI = os.getenv("LLM_GEMINI")
 if not GOOGLE_API_KEY:
     raise RuntimeError("Defina GOOGLE_API_KEY no .env")
 
 model = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
+    model=LLM_GEMINI,
     google_api_key=GOOGLE_API_KEY,
 
     # outros parâmetros diretos: temperature=..., max_output_tokens=...
@@ -70,10 +71,10 @@ def _split_sentences_pt(text: str) -> List[str]:
     return sentences
 
 def transcrever_audio_gemini(file_path: str, idioma: str):
-    """
+    f"""
     Retorna dict:
     {
-      "language": "pt-BR",
+      "language": "{idioma}",
       "text": "transcrição completa",
       "segments": ["Frase 1.", "Frase 2.", ...]
     }
@@ -89,15 +90,21 @@ def transcrever_audio_gemini(file_path: str, idioma: str):
     idioma_label = "português do Brasil" if idioma.lower() in ("pt", "pt-br", "ptbr") else idioma
 
     prompt = (
-        f"Transcreva integralmente o áudio em {idioma_label}. "
-        "Responda EXATAMENTE em JSON, sem texto extra, no formato:\n"
-        "{\n"
-        '  \"language\": \"pt-BR\",\n'
-        '  \"text\": \"transcrição completa\",\n'
-        '  \"segments\": [\"Frase 1.\", \"Frase 2.\", \"Frase 3.\"]\n'
-        "}\n"
-        "Divida os elementos de \"segments\" em cada fim de frase (ponto final, interrogação ou exclamação). "
-        "Não inclua timestamps. Não inclua comentários fora do JSON."
+        f"""
+        Transcreva integralmente o áudio em {idioma_label}.
+        Responda EXATAMENTE em JSON, sem texto extra, no formato:
+
+        {{
+          "language": "{idioma}",
+          "text": "transcrição completa",
+          "segments": ["Frase 1.", "Frase 2.", "Frase 3."]
+        }}
+
+        Divida os elementos de "segments" em cada fim de frase
+        (ponto final, interrogação ou exclamação).
+        Não inclua timestamps.
+        Não inclua comentários fora do JSON.
+        """.strip()
     )
 
     msg = HumanMessage(
