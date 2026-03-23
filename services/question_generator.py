@@ -207,7 +207,7 @@ def get_prompt_tema(tipo_questao: str):
                         de múltipla escolha com afirmativas.
                         {conteudo_sensivel}   
 
-                        Siga o seguinte raciocínio passo a passo:
+                        Siga o raciocínio passo a passo:
 
                         1. Analise o tema fornecido e identifique 4 ideias ou conceitos distintos sobre o tema que podem ser transformados em afirmativas.
                         2. Elabore um enunciado claro e contextualizado com pelo menos 50 palavras.
@@ -265,7 +265,7 @@ def get_prompt_tema(tipo_questao: str):
                         do tipo múltipla escolha com estrutura de asserção e razão.
                         {conteudo_sensivel}   
 
-                        Siga o seguinte raciocínio passo a passo:
+                        Siga o raciocínio passo a passo:
 
                         1. Analise o tema fornecido e selecione um conceito principal.
                         2. Elabore um enunciado introdutório (contexto) com pelo menos 50 palavras.
@@ -327,7 +327,7 @@ def get_prompt_pdf(tipo_questao: str):
                    de múltipla escolha para avaliação.  
                    {conteudo_sensivel}                      
 
-                  Siga o seguinte raciocínio passo a passo:
+                  Siga o raciocínio passo a passo:
 
                   1. Analise o conteúdo fornecido abaixo e identifique os conceitos mais relevantes.
                   2. Escolha um conceito central que possa ser avaliado com uma pergunta objetiva.
@@ -380,7 +380,7 @@ def get_prompt_pdf(tipo_questao: str):
                        de múltipla escolha com afirmativas.
                        {conteudo_sensivel}   
 
-                       Siga o seguinte raciocínio passo a passo:
+                       Siga o raciocínio passo a passo:
 
                        1. Analise o conteúdo fornecido e identifique 4 ideias ou conceitos distintos que podem ser transformados em afirmativas.
                        2. Elabore um enunciado claro e contextualizado com pelo menos 50 palavras.
@@ -440,7 +440,7 @@ def get_prompt_pdf(tipo_questao: str):
                                   do tipo múltipla escolha com estrutura de asserção e razão.
                                   {conteudo_sensivel}   
 
-                                  Siga o seguinte raciocínio passo a passo:
+                                  Siga o raciocínio passo a passo:
 
                                   1. Analise o conteúdo fornecido e selecione um conceito principal.
                                   2. Elabore um enunciado introdutório (contexto) com pelo menos 50 palavras.

@@ -242,7 +242,7 @@ def get_prompt_pdf(tipo_roteiro: str):
           slides, a apresentação deverá ter {tempo} slides.    
           {conteudo_sensivel}                    
 
-                   Siga o seguinte raciocínio passo a passo:
+                   Siga o raciocínio passo a passo:
 
                    1. Analise o conteúdo fornecido abaixo e identifique os conceitos mais relevantes.
                    2. Escolha um conceito central sobre o conteúdo que possa ser usado para a construção da apresentação.
@@ -274,7 +274,7 @@ def get_prompt_pdf(tipo_roteiro: str):
            a aula deverá ter {tempo} minutos.      
            {conteudo_sensivel}                  
 
-                    Siga o seguinte raciocínio passo a passo:
+                    Siga o raciocínio passo a passo:
 
                     1. Analise o conteúdo fornecido abaixo.
                     2. Escolha um conceito central sobre o conteúdo que possa ser usado para ministrar uma aula.
@@ -306,7 +306,7 @@ def get_prompt_pdf(tipo_roteiro: str):
           a vídeo-aula deverá ter {tempo} minutos.  
           {conteudo_sensivel}                      
 
-                   Siga o seguinte raciocínio passo a passo:
+                   Siga o raciocínio passo a passo:
 
                    1. Analise o conteúdo fornecido abaixo e identifique os conceitos mais relevantes
                    2. Escolha um conceito central sobre o conteúdo que possa ser usado para gravação do vídeo.

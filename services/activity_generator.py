@@ -150,7 +150,7 @@ def get_prompt_tema(tipo_atividade: str):
           
           {conteudo_sensivel}   
             {nivel}
-                               Siga o seguinte raciocínio passo a passo:
+                               Siga o raciocínio passo a passo:
 
                                1. Analise o tema fornecido abaixo.
                                2. Escolha um conceito central sobre o tema que possa ser avaliado como uma atividade do tipo estudo de caso.
@@ -182,7 +182,7 @@ def get_prompt_tema(tipo_atividade: str):
           Quadro comparativo  para avaliação.     
           {conteudo_sensivel}                   
              {nivel}
-                               Siga o seguinte raciocínio passo a passo:
+                               Siga o raciocínio passo a passo:
 
                                1. Analise o tema fornecido abaixo.
                                2. Escolha um conceito central sobre o tema que possa ser avaliado como uma atividade do tipo quadro comparativo.
@@ -212,7 +212,7 @@ def get_prompt_tema(tipo_atividade: str):
           Você é um professor de Ensino Superior e precisa elaborar questões discursivas.     
           {conteudo_sensivel}                   
              {nivel}
-                               Siga o seguinte raciocínio passo a passo:
+                               Siga o raciocínio passo a passo:
 
                                1. Analise o tema fornecido abaixo.
                                2. Escolha um conceito central sobre o tema que possa ser avaliado como uma questão discursiva.
@@ -246,7 +246,7 @@ def get_prompt_tema(tipo_atividade: str):
          Você é um professor de Ensino Superior e precisa elaborar o enunciado de {quantidade} atividade do tipo 
           Mapa mental  para avaliação.                     
              {nivel}
-                               Siga o seguinte raciocínio passo a passo:
+                               Siga  raciocínio passo a passo:
 
                                1. Analise o tema fornecido abaixo.
                                2. Escolha um conceito central sobre o tema que possa ser avaliado como uma atividade do tipo mapa mental.
@@ -283,7 +283,7 @@ def get_prompt_pdf(tipo_atividade: str):
                   tipo Estudo de caso para avaliação.      
                   {conteudo_sensivel}                  
                      {nivel}
-                                       Siga o seguinte raciocínio passo a passo:
+                                       Siga o raciocínio passo a passo:
 
                                        1. Analise o conteúdo fornecido abaixo e identifique os conceitos mais relevantes
                                        2. Escolha um conceito central sobre o tema que possa ser avaliado como uma atividade do tipo estudo de caso.
@@ -315,7 +315,7 @@ def get_prompt_pdf(tipo_atividade: str):
           Quadro comparativo  para avaliação.       
           {conteudo_sensivel}                 
              {nivel}
-                               Siga o seguinte raciocínio passo a passo:
+                               Siga o raciocínio passo a passo:
 
                                1. Analise o conteúdo fornecido abaixo e identifique os conceitos mais relevantes
                                2. Escolha um conceito central sobre o tema que possa ser avaliado como uma atividade do tipo quadro comparativo.

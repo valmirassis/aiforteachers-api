@@ -181,7 +181,7 @@ def get_prompt(tipo: str):
             """
                    Você é um tradutor e precisa traduzir o texto a seguir. 
                                                         
-                   Siga o seguinte raciocínio passo a passo:
+                   Siga o raciocínio passo a passo:
                      
                    {conteudo_sensivel}   
 
@@ -206,7 +206,7 @@ def get_prompt(tipo: str):
         return PromptTemplate.from_template(
               """
                     Reescreva o texto a seguir de forma direta sem análises ou saudações.                   
-                   Siga o seguinte raciocínio passo a passo:
+                   Siga o raciocínio passo a passo:
                    {conteudo_sensivel}
 
                    1. Analise o texto fornecido a seguir.
@@ -227,7 +227,7 @@ def get_prompt(tipo: str):
         return PromptTemplate.from_template(
             """
              Resuma o texto a seguir de forma direta sem análises ou saudações.                   
-                   Siga o seguinte raciocínio passo a passo:
+                   Siga o raciocínio passo a passo:
                    {conteudo_sensivel}
 
                    1. Analise o texto fornecido a seguir.
@@ -248,7 +248,7 @@ def get_prompt(tipo: str):
         return PromptTemplate.from_template(
             """
              Resuma o texto a seguir de forma direta sem análises ou saudações.                   
-                   Siga o seguinte raciocínio passo a passo:
+                   Siga o raciocínio passo a passo:
                    {conteudo_sensivel}
 
                    1. Analise o texto fornecido a seguir.
@@ -270,7 +270,7 @@ def get_prompt(tipo: str):
 
             """
                           Você é um professor e precisa revisar e corrigir o texto seguir.                   
-                          Siga o seguinte raciocínio passo a passo:
+                          Siga o raciocínio passo a passo:
                           {conteudo_sensivel}
     
                           1. Analise o texto fornecido a seguir.
@@ -323,7 +323,7 @@ def get_prompt(tipo: str):
 
             """
                           Você é um professor e precisa criar o texto seguir.                   
-                          Siga o seguinte raciocínio passo a passo:
+                          Siga o raciocínio passo a passo:
                           {conteudo_sensivel}
 
                           1. Analise o tema fornecido a seguir.
