@@ -5,8 +5,14 @@ O projeto Ai For Teachers tem como objetivo principal criar ferramentas intelige
 Para eventuais dúvidas, entre em contato com o pesquisador: Valmir Ribeiro de Assis v.r.assis@gmail.com. Mestrado Acadêmico em Computação aplicada - Universidade do Estado de Santa Catarina / UDESC Campus Joinville.
 ## 🚀 Tecnologias Utilizadas
 
-    PHP 8.3 disponível em https://github.com/valmirassis/
+    PHP 8.3 - backend que consome essa API - disponível em https://github.com/valmirassis/
     Composer
-    FastAPI (Python) 
     MariaDB 10
+    HTML
+    CSS
+    Javascript
+    Bootstrap
+    FastAPI (Python) - Consultar dependências no arquivo requirements.txt
+    
+    
 
