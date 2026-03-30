@@ -144,7 +144,7 @@ async def transcrever_audio(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao transcrever: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao transcrever: " + str(e))
 
 # ------- TTS: TEXTO -> ÁUDIO (GOOGLE CLOUD) -----------------------
 @app.post("/audio-sintetizar")

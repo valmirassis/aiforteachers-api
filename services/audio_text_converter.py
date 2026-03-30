@@ -73,11 +73,11 @@ def _split_sentences_pt(text: str) -> List[str]:
 def transcrever_audio_gemini(file_path: str, idioma: str):
     f"""
     Retorna dict:
-    {
+    {{
       "language": "{idioma}",
       "text": "transcrição completa",
       "segments": ["Frase 1.", "Frase 2.", ...]
-    }
+    }}
     """
     with open(file_path, "rb") as f:
         audio_bytes = f.read()
