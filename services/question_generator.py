@@ -25,7 +25,7 @@ sensitive_content = """Analise o texto fornecido e verifique se ele contém qual
                            ERRO: A solicitação contém conteúdo sensível e não pode ser processada.
                            """
 
-def gerar_questoes_tema(tema: str, tipo: str, qtd: int, dificuldade: str):
+def gerar_questoes_tema(tema: str, tipo: str, qtd: int, dificuldade: str, infos_extras: str):
     info_dificuldade = ""
     if dificuldade.lower() == "sim":
         info_dificuldade = (
@@ -33,7 +33,9 @@ def gerar_questoes_tema(tema: str, tipo: str, qtd: int, dificuldade: str):
             "usando taxonomia de Bloom níveis 1 ou 2 (lembrança ou compreensão) "
             "e uma versão difícil usando taxonomia de Bloom níveis 3, 4 ou 5 (aplicação, análise ou avaliação)."
         )
-
+    info_infos_extras = ""
+    if infos_extras.strip():
+        info_infos_extras = "Para gerar a questão considere também as informações a seguir: " + infos_extras
     # 1. Obter e formatar o prompt
     prompt_template = get_prompt_tema(tipo)
 
@@ -42,7 +44,8 @@ def gerar_questoes_tema(tema: str, tipo: str, qtd: int, dificuldade: str):
         input=tema,
         quantidade=qtd,
         dificuldade=info_dificuldade,
-        conteudo_sensivel=sensitive_content
+        conteudo_sensivel=sensitive_content,
+        info_infos_extras = info_infos_extras
     )
 
     # 3. Chamar o SDK Nativo com a configuração de raciocínio
@@ -64,15 +67,19 @@ def gerar_questoes_tema(tema: str, tipo: str, qtd: int, dificuldade: str):
     except Exception as e:
         return f"Erro ao gerar conteúdo: {e}"
 
-def gerar_questoes_pdf(arquivo, tipo: str, qtd: int, consulta: str, dificuldade: str):
+def gerar_questoes_pdf(arquivo, tipo: str, qtd: int, consulta: str, dificuldade: str, infos_extras: str):
     info_dificuldade = ""
     if dificuldade.lower() == "sim":
         info_dificuldade = (
             "Para cada questão gerada, gere uma versão com nível de dificuldade fácil "
-            "usando taxonomia de Bloom níveis 1 ou 2 (lembrança ou compreensão) "
-            "e uma versão difícil usando taxonomia de Bloom níveis 3, 4 ou 5 (aplicação, análise ou avaliação)."
+            "usando Taxonomia de Bloom níveis 1 ou 2 (lembrança ou compreensão) "
+            "e uma versão difícil usando Taxonomia de Bloom níveis 3, 4 ou 5 (aplicação, análise ou avaliação)."
+            "Ou seja, se a quantidade for 2 deve gerar 4 questões 2 fáceis e 2 dificeis"
         )
-
+    info_infos_extras = ""
+    if infos_extras.strip():
+        info_infos_extras = "Para gerar a questão considere também as informações a seguir: " + infos_extras
+    print(info_infos_extras)
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
         tmp_file.write(arquivo)
         caminho_pdf = tmp_file.name
@@ -126,7 +133,8 @@ def gerar_questoes_pdf(arquivo, tipo: str, qtd: int, consulta: str, dificuldade:
         input=texto_base,
         quantidade=qtd,
         dificuldade=info_dificuldade,
-        conteudo_sensivel=sensitive_content
+        conteudo_sensivel=sensitive_content,
+        info_infos_extras=info_infos_extras
     )
     try:
         response = client.models.generate_content(
@@ -168,6 +176,8 @@ def get_prompt_tema(tipo_questao: str):
                      9. Apresente quebras de linha entre as alternativas e entre as justificativas para ficar bem separado.
 
                      {dificuldade}
+                     
+                     {info_infos_extras}
 
                      Tema da questão:
                      {input}
@@ -220,6 +230,8 @@ def get_prompt_tema(tipo_questao: str):
                         9. Apresente quebras de linha entre as alternativas e as justificativas para ficar bem separado. 
 
                         {dificuldade}
+                        
+                        {info_infos_extras}
 
                         Tema da questão:
                         {input}
@@ -278,6 +290,9 @@ def get_prompt_tema(tipo_questao: str):
                         9. Apresente quebras de linha entre as alternativas e entre as justificativas para ficar bem separado. 
 
                         {dificuldade}
+                        
+                        {info_infos_extras}
+                        
                         Tema da questão:
                         {input}
 
@@ -342,6 +357,8 @@ def get_prompt_pdf(tipo_questao: str):
                   Evite copiar diretamente o conteúdo original. Não mencione nomes de documentos ou fontes no enunciado.
 
                   {dificuldade}
+                  
+                  {info_infos_extras}
 
                   Conteúdo de base:
                   {input}
@@ -395,6 +412,8 @@ def get_prompt_pdf(tipo_questao: str):
                        Evite copiar diretamente o conteúdo original. Não mencione o nome do documento.
 
                        {dificuldade}
+                       
+                       {info_infos_extras}
 
                        Conteúdo de base:
                        {input}
@@ -405,7 +424,6 @@ def get_prompt_pdf(tipo_questao: str):
                        **Enunciado:** ...
 
                        I. [Elabore a primeira afirmativa e insira uma quebra de linha.]
-
                        II. [Elabore a segunda afirmativa e insira uma quebra de linha.]
 
                        III. [Elabore a terceira afirmativa e insira uma quebra de linha.]
@@ -455,6 +473,9 @@ def get_prompt_pdf(tipo_questao: str):
                                   Evite copiar diretamente o conteúdo original. Não mencione o nome do documento.
 
                                   {dificuldade}
+                                  
+                                  {info_infos_extras}
+                                  
                                   Conteúdo de base:
                                   {input}
 
