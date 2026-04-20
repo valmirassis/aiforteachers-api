@@ -79,7 +79,7 @@ def gerar_questoes_pdf(arquivo, tipo: str, qtd: int, consulta: str, dificuldade:
     info_infos_extras = ""
     if infos_extras.strip():
         info_infos_extras = "Para gerar a questão considere também as informações a seguir: " + infos_extras
-    print(info_infos_extras)
+
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
         tmp_file.write(arquivo)
         caminho_pdf = tmp_file.name
